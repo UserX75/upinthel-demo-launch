@@ -1,0 +1,40 @@
+.artist-modal-header {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+}
+.artist-modal-img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.artist-bio {
+  margin-bottom: 1.5rem;
+}
+.songs-list {
+  list-style: none;
+  padding: 0;
+}
+.songs-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+.song-title {
+  font-weight: 500;
+}
+.song-streams {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+.songs-list button {
+  background: #d4af37;
+  border: none;
+  padding: 0.3rem 0.8rem;
+  border-radius: 40px;
+  cursor: pointer;
+}

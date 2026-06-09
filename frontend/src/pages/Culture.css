@@ -1,0 +1,71 @@
+.culture-hero {
+  position: relative;
+  background: linear-gradient(135deg, #1E3A8A, #3B82F6);
+  border-radius: 32px;
+  padding: 3rem 2rem;
+  margin-bottom: 2rem;
+  color: white;
+  text-align: center;
+  overflow: hidden;
+  min-height: 200px;
+}
+.culture-hero h1 {
+  color: white;  /* ensures white heading */
+}
+.scattered-icons {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* So they don't interfere with clicks */
+}
+.floating-icon {
+  position: absolute;
+  animation: float 6s ease-in-out infinite;
+  opacity: 0.3;
+  transition: opacity 0.2s;
+}
+
+.floating-icon:hover {
+  opacity: 0.8;
+  animation-duration: 2s;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-15px) rotate(5deg);
+  }
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+}
+
+/* Ensure hero text is above icons */
+.culture-hero h1,
+.culture-hero p {
+  position: relative;
+  z-index: 2;
+}
+
+/* Rest of the CSS for tabs and layout remains as before */
+.pill-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+.pill-tabs button {
+  background: #f3f4f6;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 40px;
+  font-weight: 500;
+}
+.pill-tabs button.active {
+  background: var(--color-primary, #1E3A8A);
+  color: white;
+}

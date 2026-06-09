@@ -1,0 +1,159 @@
+.upgrade-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.upgrade-hero {
+  position: relative;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-radius: 48px;
+  padding: 4rem 2rem;
+  text-align: center;
+  margin-bottom: 3rem;
+  overflow: hidden;
+  color: white;
+}
+.floating-icons {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.float-icon {
+  position: absolute;
+  font-size: 2rem;
+  opacity: 0.15;
+  animation: float 6s ease-in-out infinite;
+}
+.float-icon:nth-child(1) { top: 10%; left: 5%; animation-delay: 0s; }
+.float-icon:nth-child(2) { top: 70%; right: 8%; animation-delay: 1s; }
+.float-icon:nth-child(3) { bottom: 15%; left: 20%; animation-delay: 2s; }
+.float-icon:nth-child(4) { top: 30%; right: 20%; animation-delay: 0.5s; }
+@keyframes float {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(5deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+.delay-1 { animation-delay: 1.5s; }
+.delay-2 { animation-delay: 2.5s; }
+.delay-3 { animation-delay: 3.5s; }
+
+.pricing-cards {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 2rem 0;
+}
+.pricing-card {
+  background: white;
+  border-radius: 32px;
+  padding: 2rem;
+  width: 320px;
+  text-align: center;
+  border: 2px solid #e5e7eb;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+}
+.pricing-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 30px -12px rgba(0,0,0,0.2);
+}
+.pricing-card.active {
+  border-color: #d4af37;
+  box-shadow: 0 10px 25px -5px rgba(212,175,55,0.3);
+}
+.price {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin: 1rem 0;
+}
+.price span {
+  font-size: 1rem;
+  font-weight: normal;
+}
+.pricing-card ul {
+  text-align: left;
+  margin: 1rem 0;
+  padding-left: 1rem;
+}
+.selected-badge {
+  position: absolute;
+  top: -12px;
+  right: 20px;
+  background: #d4af37;
+  color: #0f172a;
+  padding: 0.25rem 1rem;
+  border-radius: 40px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+.upgrade-cta {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  margin: 2rem auto;
+  background: #d4af37;
+  color: #0f172a;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 60px;
+  font-weight: bold;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.upgrade-cta:hover {
+  transform: scale(1.02);
+  background: #e5b82c;
+}
+.payment-modal {
+  background: white;
+  border-radius: 32px;
+  padding: 2rem;
+  max-width: 450px;
+  width: 90%;
+  position: relative;
+}
+.payment-modal h3 {
+  margin-bottom: 1rem;
+}
+.payment-methods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+.payment-methods label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 40px;
+  cursor: pointer;
+}
+.payment-methods label.active {
+  border-color: #d4af37;
+  background: #fff8e7;
+}
+.payment-modal input {
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid #ddd;
+  border-radius: 40px;
+  margin: 0.5rem 0;
+}
+.pay-btn {
+  width: 100%;
+  background: #d4af37;
+  border: none;
+  padding: 0.8rem;
+  border-radius: 40px;
+  font-weight: bold;
+  cursor: pointer;
+}

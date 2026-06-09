@@ -1,0 +1,178 @@
+.explore-earth-container {
+  position: relative;
+  width: 100%;
+  height: 70vh;
+  cursor: pointer;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+}
+.earth-overlay {
+  position: absolute;
+  bottom: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  color: white;
+  padding: 0.8rem 2rem;
+  border-radius: 60px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  z-index: 10;
+  pointer-events: auto;
+}
+.districts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+.district-card {
+  background: white;
+  border-radius: 24px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+}
+.district-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+}
+.district-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+.district-card h3 {
+  margin: 1rem 1rem 0.5rem;
+}
+.district-card p {
+  margin: 0 1rem 1rem;
+  color: #6B7280;
+  font-size: 0.85rem;
+}
+.district-image-slideshow {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  border-radius: 20px 20px 0 0;
+}
+.district-image-slideshow img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+}
+.district-image-slideshow img.active {
+  opacity: 1;
+}
+/* Uniform card images */
+.explore-card-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+/* Modals */
+.modal-grid {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+.modal-gallery {
+  flex: 1;
+  min-width: 200px;
+}
+.modal-main-img {
+  width: 100%;
+  border-radius: 16px;
+}
+.modal-info {
+  flex: 2;
+}
+.modal-amenities ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  list-style: none;
+  padding: 0;
+}
+.modal-amenities li {
+  background: #f3f4f6;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+}
+.booking-section {
+  margin-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+}
+.date-inputs, .guest-rooms {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+.date-inputs label, .guest-rooms label {
+  width: 80px;
+}
+.check-availability {
+  background: #d4af37;
+  color: #0f172a;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 40px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.website-link {
+  display: inline-block;
+  margin-top: 1rem;
+  color: #1e3a8a;
+  text-decoration: none;
+}
+.back-button {
+  background: none;
+  border: none;
+  color: #1E3A8A; /* or your primary blue */
+  font-weight: 500;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.listings-tabs {
+  display: flex;
+  gap: 1rem;
+  border-bottom: 1px solid #E5E7EB;
+  margin-bottom: 1.5rem;
+}
+.listings-tabs button {
+  background: none;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  color: #6B7280;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+.listings-tabs button.active {
+  color: #1E3A8A;
+  border-bottom-color: #D4AF37; /* gold accent */
+}
+.loading {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.2rem;
+  color: #6B7280;
+}

@@ -1,0 +1,93 @@
+.auth-modal {
+    background: white;
+    border-radius: 32px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 450px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: fadeIn 0.3s ease;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+}
+
+.auth-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+.auth-tabs button {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 0.6rem;
+    font-weight: 600;
+    color: #6b7280;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+}
+.auth-tabs button.active {
+    color: #1e3a8a;
+    border-bottom-color: #d4af37;
+}
+.auth-modal input {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 40px;
+    font-size: 0.9rem;
+}
+.auth-error {
+    background: #fee2e2;
+    color: #b91c1c;
+    padding: 0.5rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+    text-align: center;
+}
+.auth-modal button[type="submit"] {
+    width: 100%;
+    background: #1e3a8a;
+    color: white;
+    border: none;
+    padding: 0.7rem;
+    border-radius: 40px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.auth-modal button[type="submit"]:hover {
+    background: #152c6b;
+}
+.google-btn {
+    width: 100%;
+    background: white;
+    border: 1px solid #ddd;
+    padding: 0.7rem;
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.google-btn:hover {
+    background: #f3f4f6;
+}
+.auth-footer {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+}
+.auth-footer a {
+    color: #1e3a8a;
+    text-decoration: none;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

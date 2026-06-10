@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 import EarthExplorer from '../components/EarthExplorer';
 import DistrictCard from '../components/DistrictCard';
 import AccommodationModal from '../components/AccommodationModal';
@@ -25,7 +25,7 @@ const Explore = () => {
   useEffect(() => {
     if (mode === 'districts' && districts.length === 0) {
       setLoading(true);
-      axios.get('/api/explore/districts')
+      api.get('/api/explore/districts')
         .then(res => setDistricts(res.data))
         .catch(err => console.error('Error fetching districts:', err))
         .finally(() => setLoading(false));
@@ -37,9 +37,9 @@ const Explore = () => {
     if (selectedDistrict) {
       setLoading(true);
       Promise.all([
-        axios.get(`/api/explore/${selectedDistrict.name}/accommodations`),
-        axios.get(`/api/explore/${selectedDistrict.name}/attractions`),
-        axios.get(`/api/explore/${selectedDistrict.name}/packages`)
+        api.get(`/api/explore/${selectedDistrict.name}/accommodations`),
+        api.get(`/api/explore/${selectedDistrict.name}/attractions`),
+        api.get(`/api/explore/${selectedDistrict.name}/packages`)
       ])
         .then(([accRes, attRes, pkgRes]) => {
           setAccommodations(accRes.data);

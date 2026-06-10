@@ -24,15 +24,15 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-        allow_origins=[
-        "https://upinthel-demo-launch.vercel.app",
-        "http://localhost:5173",         
+    allow_origins=[
+        "http://localhost:5173",
         "http://localhost:3000",
+        "https://upinthel-demo-launch.vercel.app",   # your exact Vercel URL
+        "https://*.vercel.app",                     # optional wildcard (allows preview deployments)
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["*"],
 )
 
 @app.options("/{path:path}")

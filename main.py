@@ -129,6 +129,7 @@ class OrderRequest(BaseModel):
 class AccommodationBooking(BaseModel):
     accommodation_id: str
     check_in: str
+    room_type: str 
     check_out: str
     guests: int
     rooms: int
@@ -450,18 +451,42 @@ def get_packages_by_district(district: str):
 # ---------- Accommodation Booking ----------
 @app.post("/api/explore/accommodations/book")
 def book_accommodation(booking: AccommodationBooking):
-    acc = supabase.table("accommodations").select("rooms_available, price_per_night, name").eq("id", booking.accommodation_id).execute()
+    # Fetch accommodation and its room_types
+    acc = supabase.table("accommodations").select("name, room_types").eq("id", booking.accommodation_id).execute()
     if not acc.data:
         raise HTTPException(404, "Accommodation not found")
-    if acc.data[0]["rooms_available"] < booking.rooms:
-        raise HTTPException(400, "Not enough rooms available")
+    
+    # Find the selected room type
+    room_types = acc.data[0].get("room_types", [])
+    selected_room = next((rt for rt in room_types if rt["name"] == booking.room_type), None)
+    if not selected_room:
+        raise HTTPException(400, "Selected room type not available")
+    
+    # Check availability
+    if selected_room["available"] < booking.rooms:
+        raise HTTPException(400, f"Not enough rooms of type {booking.room_type}")
+    
+    # Calculate nights
     nights = (datetime.fromisoformat(booking.check_out) - datetime.fromisoformat(booking.check_in)).days
-    total = nights * booking.rooms * acc.data[0]["price_per_night"]
-    supabase.table("accommodations").update({"rooms_available": acc.data[0]["rooms_available"] - booking.rooms}).eq("id", booking.accommodation_id).execute()
+    if nights <= 0:
+        raise HTTPException(400, "Invalid dates")
+    
+    total = nights * booking.rooms * selected_room["price"]
+    
+    # Update available rooms (decrement)
+    updated_room_types = []
+    for rt in room_types:
+        if rt["name"] == booking.room_type:
+            rt["available"] -= booking.rooms
+        updated_room_types.append(rt)
+    supabase.table("accommodations").update({"room_types": updated_room_types}).eq("id", booking.accommodation_id).execute()
+    
+    # Insert booking
     supabase.table("bookings").insert({
         "booking_type": "accommodation",
         "item_id": booking.accommodation_id,
         "item_name": acc.data[0]["name"],
+        "room_type": booking.room_type,
         "total_amount": total,
         "guest_name": booking.guest_name,
         "guest_email": booking.guest_email,
@@ -469,6 +494,7 @@ def book_accommodation(booking: AccommodationBooking):
         "payment_method": booking.payment_method,
         "status": "confirmed"
     }).execute()
+    
     return {"message": "Booking confirmed", "total": total}
 
 # ---------- Bookings (general) ----------

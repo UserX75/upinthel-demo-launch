@@ -77,7 +77,7 @@ export default function About() {
           <h2>Connect With Us</h2>
           <div className="contact-details">
             <p><FontAwesomeIcon icon={faEnvelope} /> info@upinthel.co.ls</p>
-            <p><FontAwesomeIcon icon={faPhoneAlt} /> +266 58124633</p>
+            <p><FontAwesomeIcon icon={faPhoneAlt} /> +266 58124633/51606722</p>
             <p><FontAwesomeIcon icon={faMapMarkerAlt} /> Botha Bothe, Lesotho</p>
           </div>
           <div className="social-links">

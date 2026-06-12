@@ -162,6 +162,119 @@ footer {
   height: 400px;
   width: 100%;
 }
+.modal-tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0 1rem;
+}
+.modal-tabs button {
+  background: none;
+  border: none;
+  padding: 0.6rem 1rem;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+.modal-tabs button.active {
+  color: #1e3a8a;
+  border-bottom-color: #d4af37;
+}
+.modal-tab-content {
+  padding: 1rem;
+}
+.description-content .modal-description {
+  line-height: 1.6;
+  margin: 1rem 0;
+}
+.booking-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.price {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 1rem 0;
+}
+.media-gallery {
+  width: 100%;
+}
+.gallery-main {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f9fafb;
+  border-radius: 16px;
+  overflow: hidden;
+}
+.gallery-media {
+  max-width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+}
+.gallery-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  z-index: 2;
+}
+.gallery-nav.prev { left: 10px; }
+.gallery-nav.next { right: 10px; }
+.gallery-thumbnails {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  margin-top: 1rem;
+}
+.thumbnail {
+  width: 80px;
+  height: 80px;
+  cursor: pointer;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  opacity: 0.7;
+}
+.thumbnail.active {
+  border-color: #d4af37;
+  opacity: 1;
+}
+.thumbnail img, .video-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #1e3a8a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+.video-thumb {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.video-thumb svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  background: rgba(0,0,0,0.6);
+  border-radius: 50%;
+  padding: 4px;
+  font-size: 12px;
+}
 /* Floating Cart Button */
 .dropdown {
   position: relative;
@@ -202,18 +315,18 @@ footer {
   margin: 1rem 0; 
   flex-wrap: wrap;
 }
-.payment-methods label {
-  display: flex;
-  align-items: center; 
-  gap: 0.5rem; 
-  padding: 0.5rem 1rem; 
-  border: 1px solid #ddd; 
-  border-radius: 40px; 
-  cursor: pointer; 
-}
 .payment-methods label.active { 
   border-color: #d4af37; 
   background: #fff8e7; 
+}
+.payment-methods label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 40px;
+  cursor: pointer;
 }
 .order-total { 
   font-size: 1.2rem; 

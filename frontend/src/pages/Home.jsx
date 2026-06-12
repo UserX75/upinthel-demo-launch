@@ -4,6 +4,7 @@ import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import Loader from '../components/Loader';
 import toast from 'react-hot-toast';
+import AdsCarousel from '../components/AdsCarousel';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane, faStar, faUser, faEnvelope, faCalendarAlt, faTag } from '@fortawesome/free-solid-svg-icons';
 import './Home.css';
@@ -16,6 +17,9 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [spotlightIndex, setSpotlightIndex] = useState(0);
   const [selectedTrending, setSelectedTrending] = useState(null);
+  const [adsData, setAdsData] = useState([]);
+  const [nominationSubmitting, setNominationSubmitting] = useState(false);
+  const currentProfile = top35[spotlightIndex];
   
   const [nominationForm, setNominationForm] = useState({
     nominator_name: '',
@@ -25,7 +29,10 @@ export default function Home() {
     nominee_field: '',
     reason: '',
   });
-  const [nominationSubmitting, setNominationSubmitting] = useState(false);
+
+  useEffect(() => {
+    api.get('/api/ads').then(res => setAdsData(res.data)).catch(console.error);
+  }, []);
 
   useEffect(() => {
     Promise.all([api.get('/api/trending'), api.get('/api/top35')])
@@ -44,8 +51,6 @@ export default function Home() {
     }, 5000);
     return () => clearInterval(interval);
   }, [top35]);
-
-  const currentProfile = top35[spotlightIndex];
 
   const handleGetInvolved = () => {
     if (!user) openLoginModal();
@@ -100,7 +105,7 @@ export default function Home() {
       <div className="home-layout">
         <div className="home-main">
           <section className="trending-section">
-            <h2>🔥 Ls Hot Topics</h2>
+            <h2>Ls Hot Topics</h2>
             <div className="horizontal-scroll">
               {trending.map((item, idx) => (
                 <div key={idx} className="trending-card" onClick={() => setSelectedTrending(item)}>
@@ -113,17 +118,30 @@ export default function Home() {
 
           {currentProfile && (
             <section className="spotlight-section">
-              <h2>🌟 Ls Top 35 Under 35</h2>
-              <div className="spotlight-card">
-                <div className="profile-img">{currentProfile.image_url || '👤'}</div>
-                <div className="spotlight-details">
-                  <h3>{currentProfile.name}</h3>
-                  <p className="field">{currentProfile.field} · Age {currentProfile.age}</p>
-                  <p className="description">{currentProfile.description}</p>
-                  <button>Connect</button>
+              <div className="two-column-section">
+                {/* Left column: Top 35 Under 35 (25%) */}
+                <div className="top35-column">
+                  {currentProfile && (
+                    <div className="spotlight-card">
+                      <div className="profile-img">{currentProfile.image_url || '👤'}</div>
+                      <div className="spotlight-details">
+                        <h3>{currentProfile.name}</h3>
+                        <p className="field">{currentProfile.field} · Age {currentProfile.age}</p>
+                        <p className="description">{currentProfile.description}</p>
+                        <button>Connect</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Right column: Ads Carousel (75%) */}
+                <div className="ads-column">
+                  <AdsCarousel ads={adsData} />
                 </div>
               </div>
-              <div className="carousel-dots">
+
+              {/* Dots (full width below both columns) */}
+              <div className="carousel-dots full-width-dots">
                 {top35.map((_, i) => (
                   <span key={i} className={i === spotlightIndex ? 'dot active' : 'dot'} onClick={() => setSpotlightIndex(i)} />
                 ))}
@@ -185,19 +203,6 @@ export default function Home() {
             </div>
           </section>
         </div>
-
-        {userRole !== 'premium' && (
-          <aside className="home-sidebar">
-            <div className="ad-placeholder">
-              <p>Advertisement</p>
-              <div>300x250</div>
-            </div>
-            <div className="ad-placeholder">
-              <p>Advertisement</p>
-              <div>300x250</div>
-            </div>
-          </aside>
-        )}
       </div>
 
       <section className="get-involved">

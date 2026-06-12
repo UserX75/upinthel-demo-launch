@@ -154,6 +154,11 @@ class EventBookingRequest(BaseModel):
     guest_email: str
     phone: Optional[str] = None
 
+class AdImpressionRequest(BaseModel):
+    ad_id: str
+    was_skipped: bool = False
+    duration_played: int = 0
+
 # ---------- Root & Health ----------
 @app.get("/")
 def root():
@@ -179,6 +184,16 @@ def get_user_profile(user_id: str):
     if not result.data:
         raise HTTPException(status_code=404, detail="User not found")
     return result.data[0]
+
+# Optional user ID extractor (for guest users)
+def get_current_user_id_optional(credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)):
+    if credentials:
+        try:
+            user = supabase.auth.get_user(credentials.credentials)
+            return user.user.id
+        except Exception:
+            pass
+    return None
 
 @app.put("/api/user/upgrade")
 def upgrade_user(user_id: str, plan_type: str):
@@ -216,6 +231,11 @@ def get_top35():
     result = supabase.table("top35").select("*").execute()
     return result.data
 
+@app.get("/api/ads")
+def get_active_ads():
+    result = supabase.table("ads").select("*").eq("is_active", True).order("display_order").execute()
+    return result.data
+
 # ---------- Culture ----------
 @app.get("/api/art")
 def get_art(limit: int = 30, offset: int = 0, search: str = "", user_id: Optional[str] = None):
@@ -249,12 +269,37 @@ def like_art(req: dict):
     
     return {"liked": True}
 
+@app.get("/api/visual-artists")
+def get_visual_artists(limit: int = 20, offset: int = 0):
+    result = supabase.table("visual_artists").select("*").order("name").range(offset, offset+limit-1).execute()
+    return result.data
+
+@app.get("/api/visual-artists/{artist_id}/artworks")
+def get_artist_artworks(artist_id: str):
+    result = supabase.table("art").select("*").eq("visual_artist_id", artist_id).order("created_at", desc=True).execute()
+    return result.data
+
 @app.get("/api/fashion")
 def get_fashion(limit: int = 30, offset: int = 0, search: str = ""):
     query = supabase.table("clothing_items").select("*, fashion_brands(name)")
     if search:
         query = query.ilike("name", f"%{search}%")
     result = query.range(offset, offset+limit-1).execute()
+    return result.data
+
+@app.get("/api/fashion/brands")
+def get_all_brands(limit: int = 20, offset: int = 0):
+    result = supabase.table("fashion_brands").select("*").order("name").range(offset, offset+limit-1).execute()
+    return result.data
+
+@app.get("/api/fashion/brands/{brand_id}/items")
+def get_brand_items(brand_id: str):
+    result = supabase.table("clothing_items").select("*").eq("brand_id", brand_id).eq("is_active", True).execute()
+    return result.data
+
+@app.get("/api/fashion/brands/{brand_id}/gallery")
+def get_brand_gallery(brand_id: str):
+    result = supabase.table("fashion_brand_gallery").select("*").eq("brand_id", brand_id).order("display_order").execute()
     return result.data
 
 @app.post("/api/fashion/like")
@@ -832,6 +877,83 @@ def get_admin_notifications(admin_id: str = Depends(get_current_user_id)):
 def mark_notification_read(id: str, admin_id: str = Depends(get_current_user_id)):
     supabase.table("admin_notifications").update({"is_read": True}).eq("id", id).execute()
     return {"message": "Marked read"}
+
+# --------ads--------
+@app.get("/api/ads/next")
+def get_next_ad():
+    # Fetch the active ad with the highest priority
+    ad = supabase.table("ad_campaigns").select("audio_file_url").eq("status", "active").limit(1).execute()
+    if ad.data:
+        return {"ad_url": ad.data[0]["audio_file_url"]}
+    return {"ad_url": None}
+
+# ---------- Signed URL for song (expires after song duration + 30s) ----------
+@app.get("/api/music/signed-url/{song_id}")
+def get_signed_song_url(song_id: str):
+    result = supabase.table("music").select("storage_path, audio_url, duration_seconds").eq("id", song_id).execute()
+    if not result.data:
+        raise HTTPException(404, "Song not found")
+    song = result.data[0]
+    storage_path = song.get("storage_path")
+    if storage_path:
+        duration = song.get("duration_seconds", 180)
+        expires_in = duration + 30
+        signed_url = supabase.storage.from_("music-audio").create_signed_url(storage_path, expires_in)
+        return {"signed_url": signed_url}
+    else:
+        # Fallback to public URL (temporary)
+        return {"signed_url": song["audio_url"]}
+
+# ---------- Weighted random ad selection ----------
+@app.get("/api/ads/next")
+def get_next_ad():
+    campaigns = supabase.table("ad_campaigns").select("*").eq("is_active", True).execute()
+    if not campaigns.data:
+        return {"ad_url": None, "ad_id": None}
+    
+    total_priority = sum(c["priority"] for c in campaigns.data)
+    if total_priority == 0:
+        selected = random.choice(campaigns.data)
+    else:
+        r = random.randint(1, total_priority)
+        cum = 0
+        selected = None
+        for c in campaigns.data:
+            cum += c["priority"]
+            if r <= cum:
+                selected = c
+                break
+    return {"ad_url": selected["audio_url"], "ad_id": selected["id"]}
+
+# ---------- Track ad impression (start, skip, completion) ----------
+@app.post("/api/ads/impression")
+def track_ad_impression(req: AdImpressionRequest, user_id: Optional[str] = Depends(get_current_user_id_optional)):
+    supabase.table("ad_impressions").insert({
+        "ad_id": req.ad_id,
+        "user_id": user_id,
+        "was_skipped": req.was_skipped,
+        "duration_played": req.duration_played
+    }).execute()
+    return {"message": "tracked"}
+
+# ---------- Admin: get ad campaign stats ----------
+@app.get("/api/admin/ad-stats")
+def get_ad_stats(admin_id: str = Depends(get_current_user_id)):
+    # You should verify admin role (e.g., is_admin flag in user_profiles)
+    campaigns = supabase.table("ad_campaigns").select("*").execute()
+    result = []
+    for camp in campaigns.data:
+        impressions = supabase.table("ad_impressions").select("id").eq("ad_id", camp["id"]).execute()
+        count = len(impressions.data)
+        revenue = (count / 1000) * camp["cpm"]
+        result.append({
+            "id": camp["id"],
+            "advertiser": camp["advertiser_name"],
+            "cpm": camp["cpm"],
+            "impressions": count,
+            "revenue": round(revenue, 2)
+        })
+    return result
 
 # ---------- Search ----------
 @app.get("/api/search")

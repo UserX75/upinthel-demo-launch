@@ -1,40 +1,150 @@
+.artist-modal-container {
+  background: white;
+  border-radius: 32px;
+  max-width: 900px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: fadeSlideUp 0.3s ease;
+}
+
+.artist-modal-content {
+  padding: 1.5rem;
+}
+
+/* Header with avatar and bio */
 .artist-modal-header {
   display: flex;
   gap: 1.5rem;
-  margin-bottom: 1.5rem;
-  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 1rem;
 }
-.artist-modal-img {
+
+.artist-avatar-large {
   width: 120px;
   height: 120px;
   border-radius: 50%;
   object-fit: cover;
+  flex-shrink: 0;
 }
+
+.artist-header-info {
+  flex: 1;
+}
+
+.artist-header-info h2 {
+  font-size: 1.8rem;
+  margin-bottom: 0.25rem;
+}
+
 .artist-bio {
-  margin-bottom: 1.5rem;
+  margin-top: 0.5rem;
+  color: #4b5563;
+  line-height: 1.5;
 }
+
+/* Songs section */
+.artist-songs {
+  margin-top: 1.5rem;
+}
+
+.artist-songs h3 {
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
 .songs-list {
-  list-style: none;
-  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
-.songs-list li {
+
+.song-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #e5e7eb;
+  padding: 0.5rem;
+  background: #f9fafb;
+  border-radius: 20px;
+  transition: background 0.2s;
 }
+
+.song-item:hover {
+  background: #f3f4f6;
+}
+
+.song-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.song-cover {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
 .song-title {
   font-weight: 500;
 }
+
 .song-streams {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #6b7280;
 }
-.songs-list button {
+
+.song-play-btn {
   background: #d4af37;
   border: none;
-  padding: 0.3rem 0.8rem;
+  padding: 0.3rem 1rem;
   border-radius: 40px;
   cursor: pointer;
+  transition: all 0.2s;
+}
+
+.song-play-btn:hover {
+  background: #e5b82c;
+  transform: scale(1.02);
+}
+
+/* Follow button inside modal */
+.modal-follow-btn {
+  background: #1e3a8a;
+  color: white;
+  border: none;
+  padding: 0.4rem 1rem;
+  border-radius: 40px;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.2s;
+}
+
+.modal-follow-btn.active {
+  background: #d4af37;
+  color: #0f172a;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .artist-modal-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .song-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .song-info {
+    width: 100%;
+  }
+  .song-play-btn {
+    width: 100%;
+  }
 }

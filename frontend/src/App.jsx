@@ -21,6 +21,7 @@ import EarningsHistory from './pages/Contributor/EarningsHistory';
 import RequestPayout from './pages/Contributor/RequestPayout';
 import ArtManager from './pages/Contributor/ArtManager';
 import ContributorApplications from './pages/Admin/ContributorApplications';
+import AdStats from './pages/Admin/AdStats';
 import { useAuth } from './context/AuthContext';
 import TopBar from './components/TopBar';
 import Upgrade from './pages/Upgrade';
@@ -55,6 +56,7 @@ function App() {
               <Route path="request-payout" element={<RequestPayout />} />
             </Route>
             <Route path="/upgrade" element={<Upgrade />} />
+            <Route path="/admin/adstats" element={<AdStats />} />
             <Route path="/become-contributor" element={<ApplyContributor />} />
             <Route path="/admin/applications" element={<ContributorApplications />} />
           </Routes>

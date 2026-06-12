@@ -51,13 +51,13 @@ export const AuthProvider = ({ children }) => {
 
   const openLoginModal = () => setShowAuthModal(true);
   const closeLoginModal = () => setShowAuthModal(false);
-  const logout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setUserRole('free');
-    setVerificationStatus('unverified');
-    window.location.reload();
-  };
+const logout = async () => {
+  await supabase.auth.signOut();
+  setUser(null);
+  setUserRole('free');
+  setVerificationStatus('unverified');
+  window.location.reload();
+};
 
   return (
     <AuthContext.Provider value={{ user, userRole, verificationStatus, loading, openLoginModal, closeLoginModal, logout, showAuthModal }}>

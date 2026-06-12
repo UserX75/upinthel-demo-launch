@@ -8,15 +8,33 @@ const api = axios.create({
   timeout: 30000,
 });
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('supabase.auth.token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+// Helper to get Supabase access token from localStorage
+const getAccessToken = () => {
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.includes('auth-token')) {
+      try {
+        const data = JSON.parse(localStorage.getItem(key));
+        return data.access_token;
+      } catch (e) {
+        return null;
+      }
+    }
   }
-  return config;
-}, (error) => Promise.reject(error));
+  return null;
+};
 
-// Response interceptor
+api.interceptors.request.use(
+  (config) => {
+    const token = getAccessToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {

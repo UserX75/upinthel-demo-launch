@@ -1,0 +1,87 @@
+.clothing-modal-container {
+  background: white;
+  border-radius: 32px;
+  max-width: 900px;
+  width: 90%;
+  position: relative;
+  animation: fadeSlideUp 0.3s ease;
+  overflow: hidden;
+}
+
+.clothing-modal-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.clothing-modal-image {
+  flex: 1;
+  min-width: 250px;
+  background: #f9fafb;
+  padding: 1rem;
+}
+
+.clothing-modal-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 24px;
+  object-fit: cover;
+}
+
+.clothing-modal-info {
+  flex: 1;
+  padding: 1.5rem;
+}
+
+.clothing-modal-info h2 {
+  font-size: 1.8rem;
+  margin-bottom: 0.25rem;
+}
+
+.clothing-modal-info .brand {
+  color: #d4af37;
+  margin-bottom: 0.5rem;
+}
+
+.clothing-modal-info .price {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0.5rem 0;
+}
+
+.clothing-modal-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.clothing-modal-actions button {
+  flex: 1;
+  padding: 0.6rem;
+  border-radius: 40px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.like-btn {
+  background: white;
+  border: 1px solid #ddd;
+  color: #1e3a8a;
+}
+
+.like-btn:hover {
+  background: #1e3a8a;
+  color: white;
+  border-color: #1e3a8a;
+}
+
+.cart-btn {
+  background: #d4af37;
+  border: none;
+  color: #0f172a;
+}
+
+.cart-btn:hover {
+  background: #e5b82c;
+  transform: scale(1.02);
+}

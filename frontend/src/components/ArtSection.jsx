@@ -1,109 +1,76 @@
 import { useEffect, useState } from 'react';
-import api from '../utils/api';
-import { useAuth } from '../context/AuthContext';
-import { useCart } from '../context/CartContext';   // <-- added import
-import toast from 'react-hot-toast';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart } from '@fortawesome/free-solid-svg-icons';
+import api from '../utils/api';   // <-- use api instead of axios
+import Carousel from './Carousel';
+import ArtItemModal from './ArtItemModal';
+import VisualArtistModal from './VisualArtistModal';
+import './ArtSection.css';
 
 export default function ArtSection() {
-  const { user } = useAuth();
-  const { addToCart } = useCart();   // <-- use cart hook
   const [artworks, setArtworks] = useState([]);
+  const [artists, setArtists] = useState([]);
+  const [selectedArt, setSelectedArt] = useState(null);
+  const [selectedArtist, setSelectedArtist] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [offset, setOffset] = useState(0);
-  const limit = 6;
 
   useEffect(() => {
-    fetchArtworks();
-  }, [search, offset, user]);
+    fetchData();
+  }, []);
 
-  const fetchArtworks = async () => {
-    setLoading(true);
+  const fetchData = async () => {
     try {
-      const params = { limit, offset, search, user_id: user?.id };
-      const res = await api.get('/api/art', { params });
-      setArtworks(res.data);
+      const [artRes, artistRes] = await Promise.all([
+        api.get('/api/art'),
+        api.get('/api/visual-artists'),
+      ]);
+      setArtworks(artRes.data);
+      setArtists(artistRes.data);
     } catch (err) {
-      toast.error('Failed to load art');
+      console.error('Error fetching art data:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleLike = async (artId) => {
-    if (!user) {
-      toast.error('Please login to like');
-      return;
-    }
-    // Optimistic update
-    setArtworks(prev => prev.map(art =>
-      art.id === artId ? { ...art, user_liked: true, likes_count: (art.likes_count || 0) + 1 } : art
-    ));
-    try {
-      await api.post('/api/art/like', { art_id: artId, user_id: user.id });
-      toast.success('Liked!');
-    } catch (err) {
-      // revert on error
-      setArtworks(prev => prev.map(art =>
-        art.id === artId ? { ...art, user_liked: false, likes_count: (art.likes_count || 1) - 1 } : art
-      ));
-      toast.error('Failed to like');
-    }
-  };
+  const renderArtCard = (art) => (
+    <div className="art-card">
+      <img src={art.image_url} alt={art.title} />
+      <h4>{art.title}</h4>
+      <p>M{art.price}</p>
+    </div>
+  );
 
-  const handleAddToCart = (item) => {
-    addToCart({
-      id: item.id,
-      type: 'art',
-      name: item.title,
-      price: item.price,
-      image: item.image_url,
-      artist: item.visual_artists?.name,
-    });
-    toast.success(`Added ${item.title} to cart`);
-  };
+  const renderArtistCard = (artist) => (
+    <div className="artist-card">
+      <img src={artist.image_url} alt={artist.name} />
+      <h4>{artist.name}</h4>
+      {artist.bio && <p>{artist.bio.slice(0, 60)}</p>}
+    </div>
+  );
 
   if (loading) return <div className="loading">Loading art...</div>;
 
   return (
     <div>
-      <div className="search-bar">
-        <input
-          type="text"
-          placeholder="Search art by title or artist..."
-          value={search}
-          onChange={(e) => { setSearch(e.target.value); setOffset(0); }}
-        />
-      </div>
-      <div className="items-grid">
-        {artworks.map(art => (
-          <div key={art.id} className="culture-card">
-            <img src={art.image_url || 'https://via.placeholder.com/300'} alt={art.title} />
-            <h3>{art.title}</h3>
-            <p className="artist">{art.visual_artists?.name || 'Unknown artist'}</p>
-            <p className="description">{art.description?.slice(0, 80)}</p>
-            <p className="price">M{art.price}</p>
-            <div className="card-actions">
-              {art.user_liked ? (
-                <button className="like-btn liked" disabled>
-                  <FontAwesomeIcon icon={faHeart} /> Liked ({art.likes_count || 0})
-                </button>
-              ) : (
-                <button className="like-btn" onClick={() => handleLike(art.id)}>
-                  <FontAwesomeIcon icon={faHeart} /> Like ({art.likes_count || 0})
-                </button>
-              )}
-              <button onClick={() => handleAddToCart(art)}>Add to Cart</button>
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="pagination">
-        <button onClick={() => setOffset(Math.max(0, offset - limit))} disabled={offset === 0}>← Previous</button>
-        <button onClick={() => setOffset(offset + limit)} disabled={artworks.length < limit}>Next →</button>
-      </div>
+      <h3 className="section-title">Featured Artworks</h3>
+      <Carousel
+        items={artworks}
+        renderItem={renderArtCard}
+        itemsPerView={3}
+        autoSlideInterval={4000}
+        onItemClick={(art) => setSelectedArt(art)}
+      />
+
+      <h3 className="section-title">Visual Artists</h3>
+      <Carousel
+        items={artists}
+        renderItem={renderArtistCard}
+        itemsPerView={3}
+        autoSlideInterval={6000}
+        onItemClick={(artist) => setSelectedArtist(artist)}
+      />
+
+      {selectedArt && <ArtItemModal item={selectedArt} onClose={() => setSelectedArt(null)} />}
+      {selectedArtist && <VisualArtistModal artist={selectedArtist} onClose={() => setSelectedArtist(null)} />}
     </div>
   );
 }

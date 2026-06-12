@@ -32,17 +32,15 @@ export default function ArtistCard({ artist, onSelect, onFollowChange }) {
   };
 
   return (
-    <div className="artist-card" onClick={() => onSelect(artist)}>
-      <div className="artist-image">
+    <div className="artist-card-carousel" onClick={() => onSelect(artist)}>
+      <div className="artist-avatar">
         <img src={artist.image_url || '/artist-placeholder.png'} alt={artist.name} />
       </div>
-      <div className="artist-info">
-        <h4>{artist.name}</h4>
-        <p>{artist.genre || 'Various'}</p>
-        <button className={`follow-btn ${followed ? 'active' : ''}`} onClick={handleFollow}>
-          <FontAwesomeIcon icon={faHeart} /> {followed ? 'Followed' : 'Follow'}
-        </button>
-      </div>
+      <h4>{artist.name}</h4>
+      <p className="artist-genre">{artist.genre || 'Various'}</p>
+      <button className={`follow-btn ${followed ? 'active' : ''}`} onClick={handleFollow}>
+        <FontAwesomeIcon icon={faHeart} /> {followed ? 'Followed' : 'Follow'}
+      </button>
     </div>
   );
 }

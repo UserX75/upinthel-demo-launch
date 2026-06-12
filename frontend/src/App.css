@@ -39,10 +39,9 @@ h2 {
   padding-left: 1rem; margin-bottom: 1.5rem; }
 /* ---------- Layout ---------- */
 .main-content {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
   width: 100%;
+  padding: 2rem 1.5rem;
+  box-sizing: border-box;
 }
 .app {
   min-height: 100vh;
@@ -748,4 +747,22 @@ footer {
     z-index: 100;
   }
   .nav-links.open { right: 0; }
+}
+.skip-ad-btn {
+  background: #d4af37;
+  color: #0f172a;
+  border: none;
+  border-radius: 40px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.7rem;
+  cursor: pointer;
+  margin-left: 0.5rem;
+}
+.ad-label {
+  font-weight: bold;
+  background: #ef4444;
+  padding: 0.2rem 0.5rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  color: white;
 }

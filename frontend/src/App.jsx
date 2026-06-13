@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import { useState } from 'react';
 import Home from './pages/Home';
 import Culture from './pages/Culture';
@@ -25,6 +25,7 @@ import AdStats from './pages/Admin/AdStats';
 import { useAuth } from './context/AuthContext';
 import TopBar from './components/TopBar';
 import Upgrade from './pages/Upgrade';
+import AdminDashboard from './pages/Admin/Dashboard';
 import './App.css';
 
 function App() {
@@ -59,6 +60,9 @@ function App() {
             <Route path="/admin/adstats" element={<AdStats />} />
             <Route path="/become-contributor" element={<ApplyContributor />} />
             <Route path="/admin/applications" element={<ContributorApplications />} />
+            <Route path="/admin/*" element={
+              user?.is_super_admin ? <AdminDashboard /> : <Navigate to="/" />
+            } />
           </Routes>
         </main>
         <AuthModal isOpen={showAuthModal} onClose={closeLoginModal} onLogin={() => window.location.reload()} />

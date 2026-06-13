@@ -28,7 +28,8 @@ app.add_middleware(
         "http://localhost:5173",
         "http://localhost:3000",
         "https://upinthel-demo-launch.vercel.app",   # your exact Vercel URL
-        "https://*.vercel.app",                     # optional wildcard (allows preview deployments)
+        "https://*.vercel.app", 
+        "http://127.0.0.1:5173",                    # optional wildcard (allows preview deployments)
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -160,6 +161,16 @@ class AdImpressionRequest(BaseModel):
     was_skipped: bool = False
     duration_played: int = 0
 
+class TrackInteraction(BaseModel):
+    item_type: str
+    item_id: str
+    action: str
+
+class SetAdminRequest(BaseModel):
+    user_id: str
+    is_admin: bool
+    is_super_admin: Optional[bool] = False
+
 # ---------- Root & Health ----------
 @app.get("/")
 def root():
@@ -219,13 +230,9 @@ def upgrade_user(user_id: str, plan_type: str):
 
 # ---------- Home ----------
 @app.get("/api/trending")
-def get_trending():
-    return [
-        {"category": "🎵 Music", "title": "Tsepo Tshola Tribute Concert – This Saturday at Maseru Stadium", "link": "#"},
-        {"category": "⚽ Sports", "title": "Likuena vs. Bafana Bafana: Tickets now on sale", "link": "#"},
-        {"category": "💼 Business", "title": "Sekhametsi Consortium announces new youth investment fund", "link": "#"},
-        {"category": "🎨 Art", "title": "Morija Arts & Cultural Festival – Call for artists", "link": "#"},
-    ]
+def get_trending(limit: int = 12):
+    result = supabase.rpc("get_trending_data", {"limit_count": limit}).execute()
+    return result.data  # already JSON array
 
 @app.get("/api/top35")
 def get_top35():
@@ -398,11 +405,32 @@ def get_accommodations():
 
 @app.get("/api/explore/restaurants")
 def get_restaurants():
-    return [
-        {"id": "res1", "name": "Piri Piri", "cuisine": "Portuguese", "location": "Maseru", "avg_price": 350, "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400"},
-        {"id": "res2", "name": "Nello's Pizza", "cuisine": "Italian", "location": "Maseru", "avg_price": 250, "image": "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400"},
-        {"id": "res3", "name": "The Courtyard", "cuisine": "International", "location": "Maseru", "avg_price": 400, "image": "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=400"},
-    ]
+    # Get all restaurants
+    restaurants = supabase.table("restaurants").select("*").execute()
+    
+    result = []
+    for rest in restaurants.data:
+        # Get menu items for this restaurant
+        menu = supabase.table("restaurant_menu_items")\
+            .select("id, item_name, description, price, category")\
+            .eq("restaurant_id", rest["id"])\
+            .eq("is_available", True)\
+            .execute()
+        
+        # Transform to the shape expected by FoodSection.jsx
+        rest["menu"] = [
+            {
+                "id": item["id"],
+                "name": item["item_name"],
+                "description": item["description"],
+                "price": float(item["price"]),
+                "category": item.get("category")
+            }
+            for item in menu.data
+        ]
+        result.append(rest)
+    
+    return result
 
 @app.get("/api/explore/attractions")
 def get_attractions():
@@ -980,6 +1008,47 @@ def get_ad_stats(admin_id: str = Depends(get_current_user_id)):
             "revenue": round(revenue, 2)
         })
     return result
+
+@app.post("/api/track-interaction")
+def track_interaction(req: TrackInteraction, user_id: Optional[str] = Depends(get_current_user_id_optional)):
+    supabase.table("trending_interactions").insert({
+        "item_type": req.item_type,
+        "item_id": req.item_id,
+        "action": req.action,
+        "user_id": user_id
+    }).execute()
+    return {"message": "tracked"}
+
+@app.get("/api/admin/users")
+def get_all_users(admin_id: str = Depends(get_current_user_id)):
+    # Check if requester is super admin
+    user = supabase.table("user_profiles").select("is_super_admin").eq("id", admin_id).execute()
+    if not user.data or not user.data[0].get("is_super_admin"):
+        raise HTTPException(403, "Only super admin can view all users")
+    result = supabase.table("user_profiles").select("id, email, full_name, is_admin, is_super_admin, role").execute()
+    return result.data
+
+@app.post("/api/admin/set-admin")
+def set_admin(req: SetAdminRequest, admin_id: str = Depends(get_current_user_id)):
+    # Super admin check
+    user = supabase.table("user_profiles").select("is_super_admin").eq("id", admin_id).execute()
+    if not user.data or not user.data[0].get("is_super_admin"):
+        raise HTTPException(403, "Only super admin can change admin status")
+    # Update user
+    supabase.table("user_profiles").update({
+        "is_admin": req.is_admin,
+        "is_super_admin": req.is_super_admin
+    }).eq("id", req.user_id).execute()
+    return {"message": "Admin status updated"}
+
+@app.delete("/api/admin/remove-admin")
+def remove_admin(user_id: str, admin_id: str = Depends(get_current_user_id)):
+    # Super admin check
+    user = supabase.table("user_profiles").select("is_super_admin").eq("id", admin_id).execute()
+    if not user.data or not user.data[0].get("is_super_admin"):
+        raise HTTPException(403, "Only super admin can remove admin")
+    supabase.table("user_profiles").update({"is_admin": False, "is_super_admin": False}).eq("id", user_id).execute()
+    return {"message": "Admin removed"}
 
 # ---------- Search ----------
 @app.get("/api/search")

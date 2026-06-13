@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import Loader from '../components/Loader';
 import toast from 'react-hot-toast';
 import AdsCarousel from '../components/AdsCarousel';
+import Carousel from '../components/Carousel';   // <-- import Carousel
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane, faStar, faUser, faEnvelope, faCalendarAlt, faTag } from '@fortawesome/free-solid-svg-icons';
 import './Home.css';
@@ -12,14 +13,13 @@ import './Home.css';
 export default function Home() {
   const navigate = useNavigate();
   const { user, userRole, openLoginModal } = useAuth();
-  const [trending, setTrending] = useState([]);
   const [top35, setTop35] = useState([]);
   const [loading, setLoading] = useState(true);
   const [spotlightIndex, setSpotlightIndex] = useState(0);
   const [selectedTrending, setSelectedTrending] = useState(null);
   const [adsData, setAdsData] = useState([]);
+  const [trendingItems, setTrendingItems] = useState([]);
   const [nominationSubmitting, setNominationSubmitting] = useState(false);
-  const currentProfile = top35[spotlightIndex];
   
   const [nominationForm, setNominationForm] = useState({
     nominator_name: '',
@@ -30,18 +30,29 @@ export default function Home() {
     reason: '',
   });
 
+  // Fetch ads
   useEffect(() => {
     api.get('/api/ads').then(res => setAdsData(res.data)).catch(console.error);
   }, []);
 
+  // Fetch trending items (algorithmic + manual)
   useEffect(() => {
-    Promise.all([api.get('/api/trending'), api.get('/api/top35')])
-      .then(([trendingRes, top35Res]) => {
-        setTrending(trendingRes.data);
-        setTop35(top35Res.data);
+    api.get('/api/trending?limit=12')
+      .then(res => setTrendingItems(res.data))
+      .catch(err => console.error(err));
+  }, []);
+
+  // Fetch Top 35 Under 35
+  useEffect(() => {
+    api.get('/api/top35')
+      .then(res => {
+        setTop35(res.data);
+        setLoading(false);
       })
-      .catch(() => toast.error('Failed to load data'))
-      .finally(() => setLoading(false));
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+      });
   }, []);
 
   useEffect(() => {
@@ -51,6 +62,8 @@ export default function Home() {
     }, 5000);
     return () => clearInterval(interval);
   }, [top35]);
+
+  const currentProfile = top35[spotlightIndex];
 
   const handleGetInvolved = () => {
     if (!user) openLoginModal();
@@ -92,6 +105,24 @@ export default function Home() {
     }
   };
 
+  // Helper to open detail modal/page
+  const openDetail = (type, id) => {
+    console.log(`Open ${type} with id ${id}`);
+    // You can add navigation or modal logic here
+  };
+
+  // Render each trending item as a card
+  const renderTrendingCard = (item) => {
+    const data = item.data;
+    return (
+      <div className="trending-card">
+        <img src={data.image} alt={data.title} />
+        <div className="trending-category">{item.type}</div>
+        <div className="trending-title">{data.title}</div>
+      </div>
+    );
+  };
+
   if (loading) return <Loader />;
 
   return (
@@ -102,45 +133,44 @@ export default function Home() {
         <button onClick={() => navigate('/explore')}>Start Exploring →</button>
       </div>
 
+      {/* Trending Now carousel */}
+      <section className="trending-section">
+        <h2>Trending Now</h2>
+        <Carousel
+          items={trendingItems}
+          renderItem={renderTrendingCard}
+          itemsPerView={4}
+          autoSlideInterval={5000}
+          onItemClick={(item) => openDetail(item.type, item.id)}
+        />
+      </section>
+
       <div className="home-layout">
         <div className="home-main">
-          <section className="trending-section">
-            <h2>Ls Hot Topics</h2>
-            <div className="horizontal-scroll">
-              {trending.map((item, idx) => (
-                <div key={idx} className="trending-card" onClick={() => setSelectedTrending(item)}>
-                  <div className="trending-category">{item.category}</div>
-                  <div>{item.title}</div>
-                </div>
-              ))}
-            </div>
-          </section>
-
           {currentProfile && (
             <section className="spotlight-section">
               <div className="two-column-section">
-                {/* Left column: Top 35 Under 35 (25%) */}
+                {/* Left column: Top 35 Under 35 */}
                 <div className="top35-column">
-                  {currentProfile && (
-                    <div className="spotlight-card">
-                      <div className="profile-img">{currentProfile.image_url || '👤'}</div>
-                      <div className="spotlight-details">
-                        <h3>{currentProfile.name}</h3>
-                        <p className="field">{currentProfile.field} · Age {currentProfile.age}</p>
-                        <p className="description">{currentProfile.description}</p>
-                        <button>Connect</button>
-                      </div>
+                  <h2>Ls Top 35 Under 35</h2>
+                  <div className="spotlight-card">
+                    <div className="profile-img">{currentProfile.image_url || '👤'}</div>
+                    <div className="spotlight-details">
+                      <h3>{currentProfile.name}</h3>
+                      <p className="field">{currentProfile.field} · Age {currentProfile.age}</p>
+                      <p className="description">{currentProfile.description}</p>
+                      <button>Connect</button>
                     </div>
-                  )}
+                  </div>
                 </div>
 
-                {/* Right column: Ads Carousel (75%) */}
+                {/* Right column: Ads Carousel */}
                 <div className="ads-column">
                   <AdsCarousel ads={adsData} />
                 </div>
               </div>
 
-              {/* Dots (full width below both columns) */}
+              {/* Dots below the two columns */}
               <div className="carousel-dots full-width-dots">
                 {top35.map((_, i) => (
                   <span key={i} className={i === spotlightIndex ? 'dot active' : 'dot'} onClick={() => setSpotlightIndex(i)} />
@@ -157,6 +187,7 @@ export default function Home() {
                 <p>Help us discover the next generation of Basotho entrepreneurs, artists, and changemakers.</p>
               </div>
               <form onSubmit={handleNominationSubmit} className="nomination-form">
+                {/* ... form fields (unchanged) ... */}
                 <div className="form-row">
                   <div className="form-group">
                     <label><FontAwesomeIcon icon={faUser} /> Your full name *</label>
@@ -227,15 +258,15 @@ export default function Home() {
       </section>
 
       {selectedTrending && (
-      <div className="modal-overlay" onClick={() => setSelectedTrending(null)}>
-        <div className="modal-content" onClick={e => e.stopPropagation()}>
-          <button className="modal-close" onClick={() => setSelectedTrending(null)}>✖</button>
-          <h3>{selectedTrending.category}</h3>
-          <p>{selectedTrending.title}</p>
-          <a href={selectedTrending.link} target="_blank" rel="noopener noreferrer">Read more</a>
+        <div className="modal-overlay" onClick={() => setSelectedTrending(null)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setSelectedTrending(null)}>✖</button>
+            <h3>{selectedTrending.category}</h3>
+            <p>{selectedTrending.title}</p>
+            <a href={selectedTrending.link} target="_blank" rel="noopener noreferrer">Read more</a>
+          </div>
         </div>
-      </div>
-    )}
+      )}
     </div>
   );
 }

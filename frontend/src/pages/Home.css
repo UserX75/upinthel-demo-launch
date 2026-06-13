@@ -56,17 +56,48 @@
   gap: 1rem;
   padding-bottom: 0.5rem;
 }
+.trending-section {
+  margin: 2rem 0;
+  padding: 0 1rem;
+}
 .trending-card {
-  min-width: 280px;
   background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 20px;
-  padding: 1rem;
-  transition: transform 0.2s;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+  cursor: pointer;
+  width: 100%;
+  max-width: 280px;      /* Fixed max width – adjust as needed */
+  margin: 0 auto;
 }
 .trending-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+}
+.trending-card img {
+  width: 100%;
+  height: 180px;         /* Fixed height, adjust based on design */
+  object-fit: cover;     /* Crops to fit without distortion */
+  display: block;
+}
+.trending-category {
+  display: inline-block;
+  background: #f0f0f0;
+  padding: 4px 8px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  margin: 0.75rem 0 0 0.75rem;
+  color: #555;
+}
+.trending-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.5rem 0.75rem 0.75rem 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 /* Single spotlight card (left‑aligned) */
 .spotlight-card {
